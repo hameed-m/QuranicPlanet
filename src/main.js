@@ -13,7 +13,7 @@ import './styles/main.css';
 import { SURAS, getMeccanSuras, getMedinanSuras } from './data/suras.js';
 import { enrichSuras } from './data/sura-game-data.js';
 import { generateContinents } from './engine/continents.js';
-import { MapRenderer } from './engine/renderer.js';
+import { GlobeRenderer } from './engine/globe-renderer.js';
 import { UIManager, createLoadingParticles } from './components/ui-manager.js';
 import { World3D } from './engine/world3d.js';
 import { CharacterController } from './engine/character.js';
@@ -123,8 +123,8 @@ class QuranicPlanet {
     this.ui.setLoadingProgress(65, 'Filling the Ocean of Revelation...');
     await this.sleep(300);
 
-    // Create and initialize 2D renderer
-    this.renderer = new MapRenderer(this.canvas, this.continentData);
+    // Create and initialize 3D Globe renderer
+    this.renderer = new GlobeRenderer(this.canvas, this.continentData);
     this.renderer.init();
 
     this.ui.setLoadingProgress(75, 'Preparing the 3D world...');
