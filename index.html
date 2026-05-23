@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Quranic Planet — An open-world educational RPG where the entire Quran is experienced as an explorable planet with 114 unique countries." />
+  <title>Quranic Planet — Explore the World of Revelation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="loading-content">
+      <div class="loading-calligraphy">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+      <div class="loading-title">Quranic Planet</div>
+      <div class="loading-subtitle">Explore the World of Revelation</div>
+      <div class="loading-bar-container">
+        <div class="loading-bar" id="loading-bar"></div>
+      </div>
+      <div class="loading-status" id="loading-status">Generating continents...</div>
+    </div>
+    <div class="loading-particles" id="loading-particles"></div>
+  </div>
+
+  <!-- Main Game Container -->
+  <div id="game-container" class="hidden">
+    <!-- The 2D Canvas -->
+    <canvas id="world-map"></canvas>
+
+    <!-- 3D World Container -->
+    <div id="world3d-container" class="hidden"></div>
+
+    <!-- Transition Overlay (for Google Earth drop effect) -->
+    <div id="transition-overlay"></div>
+
+    <!-- Top HUD -->
+    <header id="top-hud">
+      <div class="hud-left">
+        <div class="logo-container">
+          <span class="logo-icon">☪</span>
+          <span class="logo-text">Quranic Planet</span>
+        </div>
+      </div>
+      <div class="hud-center">
+        <div class="location-display" id="location-display">
+          <span class="location-icon">🌍</span>
+          <span class="location-text" id="location-text">The Ocean of Revelation</span>
+        </div>
+      </div>
+      <div class="hud-right">
+        <button class="hud-btn" id="btn-mushaf" title="Mushaf Log">
+          <span class="btn-icon">📖</span>
+        </button>
+        <button class="hud-btn" id="btn-search" title="Search Suras">
+          <span class="btn-icon">🔍</span>
+        </button>
+        <button class="hud-btn" id="btn-settings" title="Settings">
+          <span class="btn-icon">⚙️</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Bottom Stats Bar -->
+    <footer id="bottom-hud">
+      <div class="stats-container">
+        <div class="stat-item">
+          <span class="stat-label">Suras Explored</span>
+          <span class="stat-value" id="stat-suras">0 / 114</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-label">Ayat Mastered</span>
+          <span class="stat-value" id="stat-ayat">0 / 6,236</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-label">Connections Found</span>
+          <span class="stat-value" id="stat-connections">0</span>
+        </div>
+      </div>
+      <div class="controls-hint" id="controls-hint-map">
+        <span>🖱️ Drag to pan</span>
+        <span>🔍 Scroll to zoom</span>
+        <span>📍 Click a country to explore</span>
+      </div>
+    </footer>
+
+    <!-- 3D Mode HUD -->
+    <div id="hud-3d" class="hidden">
+      <div class="hud3d-top">
+        <button class="hud3d-btn" id="btn-back-to-map" title="Back to Map (M)">
+          <span>🗺️</span> Back to Map
+        </button>
+        <div class="hud3d-sura" id="hud3d-sura-name"></div>
+      </div>
+      <div class="hud3d-bottom">
+        <div class="vehicle-selector" id="vehicle-selector">
+          <button class="vehicle-btn active" data-vehicle="walk" title="Walk (0)">🚶 Walk</button>
+          <button class="vehicle-btn" data-vehicle="bicycle" title="Bicycle (1)">🚲 Bicycle</button>
+          <button class="vehicle-btn" data-vehicle="motorbike" title="Motorbike (2)">🏍️ Motorbike</button>
+          <button class="vehicle-btn" data-vehicle="boat" title="Boat (3)">🚣 Boat</button>
+        </div>
+        <div class="hud3d-controls-hint">
+          <span>WASD to move</span>
+          <span>Mouse drag to look</span>
+          <span>Scroll to zoom</span>
+          <span>Shift for boost</span>
+        </div>
+      </div>
+      <div class="hud3d-ayah" id="hud3d-ayah"></div>
+    </div>
+
+    <!-- Country Detail Panel (Side Panel) -->
+    <aside id="country-panel" class="panel hidden">
+      <button class="panel-close" id="panel-close">✕</button>
+      <div class="panel-header">
+        <div class="panel-sura-number" id="panel-sura-number">1</div>
+        <div class="panel-titles">
+          <h2 class="panel-name-ar" id="panel-name-ar">الفاتحة</h2>
+          <h3 class="panel-name-en" id="panel-name-en">The Opening</h3>
+        </div>
+        <div class="panel-badge" id="panel-badge">Meccan</div>
+      </div>
+      <div class="panel-biome-banner" id="panel-biome-banner">
+        <span class="biome-label" id="panel-biome-label">Celestial Floating Island</span>
+      </div>
+      <div class="panel-stats-grid">
+        <div class="panel-stat">
+          <span class="panel-stat-value" id="panel-ayat-count">7</span>
+          <span class="panel-stat-label">Ayat</span>
+        </div>
+        <div class="panel-stat">
+          <span class="panel-stat-value" id="panel-word-count">29</span>
+          <span class="panel-stat-label">Words</span>
+        </div>
+        <div class="panel-stat">
+          <span class="panel-stat-value" id="panel-juz">1</span>
+          <span class="panel-stat-label">Juz'</span>
+        </div>
+        <div class="panel-stat">
+          <span class="panel-stat-value" id="panel-tier">Hub</span>
+          <span class="panel-stat-label">Tier</span>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h4 class="panel-section-title">Theme</h4>
+        <p class="panel-theme" id="panel-theme">The Mother of the Book — gateway to all knowledge.</p>
+      </div>
+      <div class="panel-section">
+        <h4 class="panel-section-title">Landmarks</h4>
+        <ul class="panel-landmarks" id="panel-landmarks">
+          <li>Bismillah Plaza</li>
+        </ul>
+      </div>
+      <div class="panel-section">
+        <h4 class="panel-section-title">Weather</h4>
+        <div class="panel-weather" id="panel-weather">
+          <span class="weather-icon">✨</span>
+          <span class="weather-text">Celestial Glow</span>
+        </div>
+      </div>
+      <div class="panel-actions">
+        <button class="action-btn primary" id="btn-explore">
+          <span>🚀</span> Explore Country
+        </button>
+        <button class="action-btn secondary" id="btn-recite">
+          <span>🎧</span> Listen to Recitation
+        </button>
+      </div>
+    </aside>
+
+    <!-- Minimap -->
+    <div id="minimap-container">
+      <canvas id="minimap" width="200" height="120"></canvas>
+      <div class="minimap-label">World Map</div>
+    </div>
+
+    <!-- Compass -->
+    <div id="compass">
+      <div class="compass-ring">
+        <span class="compass-n">N</span>
+        <span class="compass-e">E</span>
+        <span class="compass-s">S</span>
+        <span class="compass-w">W</span>
+      </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div id="search-modal" class="modal hidden">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content search-content">
+        <div class="search-header">
+          <input type="text" id="search-input" placeholder="Search Suras... (e.g., Al-Kahf, The Cave, الكهف)" autocomplete="off" />
+          <button class="modal-close" id="search-close">✕</button>
+        </div>
+        <div class="search-filters">
+          <button class="filter-btn active" data-filter="all">All (114)</button>
+          <button class="filter-btn" data-filter="meccan">Meccan (86)</button>
+          <button class="filter-btn" data-filter="medinan">Medinan (28)</button>
+        </div>
+        <div class="search-results" id="search-results"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
